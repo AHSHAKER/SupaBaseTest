@@ -124,7 +124,7 @@ export const cancelSubscription = async (planId: string, planName: string) => {
             subscription_id: data?.subscription_id,
             currency: 'USD',
             amount: 0,
-            event_type: 'plan_change',
+            event_type: 'plan_cancellation',
             description: `Canceled subscription ${planName}`,
         };
 
