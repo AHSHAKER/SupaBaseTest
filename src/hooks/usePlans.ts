@@ -100,29 +100,32 @@ export const subscribeToPlan = async (plan: { planId: string; plan_code: string;
     }
 }
 
-export const cancelSubscription = async (subscriptionId: string) => {
+export const cancelSubscription = async (planId: string, planName: string) => {
     const user_id = useAuthStore.getState().user_id;
     if (!user_id) throw new Error("User not authenticated");
 
-    console.log("Cancelling subscription:", subscriptionId);
+    console.log("Cancelling subscription:", planId);
 
     try {
         const { data, error } = await supabase
             .from('subscriptions')
             .update({ status: 'canceled' })
-            .eq('subscription_id', subscriptionId)
+            .eq('plan_id', planId)
+            .eq('user_id', user_id)
+            .eq('status', 'active')
+            .select('subscription_id')
             .single();
 
         if (error) throw error;
-
+        console.log("Subscription canceled in DB:", data);
         const transaction: transaction = {
             user_id: user_id,
             status: 'succeeded',
-            subscription_id: subscriptionId,
+            subscription_id: data?.subscription_id,
             currency: 'USD',
             amount: 0,
             event_type: 'plan_change',
-            description: `Canceled subscription ${subscriptionId}`,
+            description: `Canceled subscription ${planName}`,
         };
 
         useAuthStore.getState().plan = null;

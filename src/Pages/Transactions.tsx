@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { getTransactions } from "../hooks/useTransactions";
+import type { transaction } from "../hooks/useTransactions";
 import LoadingSpinner from "../Components/Randoms/LoadingSpinner";
 
 const Transactions = () => {
-    const [transactions, setTransactions] = useState<any[]>([]);
+    const [transactions, setTransactions] = useState<transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error,setError] = useState<string | null>(null);
 
@@ -61,8 +62,8 @@ useEffect(() => {
           </thead>
           <tbody>
             {transactions.map((tx, i) => {
-              const key = tx.id ?? i;
-              const rawDate = tx.created_at ?? tx.date ?? tx.timestamp;
+              const key = tx.transaction_id ?? i;
+              const rawDate = tx.created_at;
               const date = rawDate ? new Date(rawDate) : null;
               const amount = Number(tx.amount) || 0;
               const positive = amount >= 0;
@@ -73,9 +74,9 @@ useEffect(() => {
               return (
                 <tr key={key} style={{ borderTop: "1px solid #eef2f7" }}>
                   <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
-                    <div style={{ fontWeight: 600 }}>{tx.description ?? tx.title ?? "—"}</div>
+                    <div style={{ fontWeight: 600 }}>{tx.description ?? "—"}</div>
                     <div style={{ marginTop: 6, fontSize: 13, color: "#64748b" }}>
-                      {tx.category ?? tx.type ?? "Unknown"}
+                      {tx.event_type ?? "Unknown"}
                     </div>
                   </td>
 
@@ -88,7 +89,7 @@ useEffect(() => {
                       {(amount).toLocaleString(undefined, { style: "currency", currency: "USD" })}
                     </div>
                     <div style={{ marginTop: 6, fontSize: 12, color: "#94a3b8" }}>
-                      {tx.method ?? tx.source ?? "—"}
+                      {tx.payment_type_id ? `Payment Type: ${tx.payment_type_id}` : tx.external_reference ?? "—"}
                     </div>
                   </td>
 

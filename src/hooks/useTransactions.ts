@@ -2,7 +2,7 @@ import supabase from "../SupabaseUsers";
 import type { TablesInsert } from "../../database.types";
 import useAuthStore from "../Store/authStore";
 
-export type transaction = Omit<TablesInsert<"transactions_history">, "id" | "created_at" | "updated_at">;
+export type transaction = TablesInsert<"transactions_history">;
 
 export const getTransactions = async () => {
 
