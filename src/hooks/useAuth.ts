@@ -1,12 +1,13 @@
 import supabase from "../SupabaseUsers";
 import type { SignUpValues, SignInValues }  from "../Interfaces/UseAuthI";
+import useAuthStore from "../Store/authStore";
 
 export async function signUp(formData: SignUpValues) {
   return await supabase.auth.signUp({
     email: formData.email,
     password: formData.password,
     options: {
-      data: {
+        data: {
         full_name: formData.full_name ?? null,
         phone: formData.phone ?? null,
         address: formData.address ?? null,
@@ -25,5 +26,7 @@ export async function signIn(formData: SignInValues) {
 }
 
 export async function signOut() {
-    return await supabase.auth.signOut();
+  const result = await supabase.auth.signOut();
+  useAuthStore.getState().clearProfile();
+  return result;
 }

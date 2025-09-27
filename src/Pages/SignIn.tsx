@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { signIn } from "../hooks/useAuth"
 import type { SignInValues } from "../Interfaces/UseAuthI"
 import { useNavigate } from "react-router-dom"
+import { setProfile } from "../hooks/useProfile"
 
 const SignIn: React.FC = () => {
   const Nav = useNavigate()
@@ -23,6 +24,8 @@ const SignIn: React.FC = () => {
         alert(error.message)
         return
       }
+
+      await setProfile();
       Nav("/")
     } catch (err) {
       console.error(err)
@@ -81,6 +84,11 @@ const SignIn: React.FC = () => {
           Don't have an account?{" "}
           <a href="/sign-up" className="underline hover:text-white">
             Sign Up
+          </a>
+        </p>
+        <p className="mt-2 text-center text-sm text-white/80">
+          <a href="/reset-password" className="underline hover:text-white">
+            Forgot your password?
           </a>
         </p>
       </form>

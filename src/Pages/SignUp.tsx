@@ -19,7 +19,8 @@ const SignUp: React.FC = () => {
 
   const onSubmit = async (formData: SignUpValues) => {
     try {
-      const { error } = await signUp(formData);
+      const { data, error } = await signUp(formData);
+      console.log(data, error);
 
       if (error) {
         console.error("Sign up error:", error);
@@ -27,7 +28,7 @@ const SignUp: React.FC = () => {
         return;
       }
 
-      alert("Sign up successful!");
+      alert("We sent you a confirmation email. Please check your inbox to verify your account before signing in.");
       Nav("/sign-in");
     } catch (err) {
       console.error(err);

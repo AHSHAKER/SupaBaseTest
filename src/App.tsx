@@ -4,7 +4,11 @@ import SignIn from './Pages/SignIn'
 import SignUp from './Pages/SignUp'
 import ProtectedLayout from './Pages/ProtectedLayout'
 import Profile from './Pages/Profile'
-// import Plans from './Pages/Plans'
+import EditAccount from './Pages/EditAccount'
+import ResetPass from './Pages/ResetPass'
+import UpdatePass from './Pages/updatepass'
+import Plans from './Pages/Plans'
+import Transactions from './Pages/Transactions'
 
 function App() {
 
@@ -13,12 +17,16 @@ function App() {
       <Routes>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/reset-password" element={<ResetPass />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
           <Route index path="/" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
-          {/* <Route path="/plans" element={<Plans />} /> */}
+          <Route path="/edit-account" element={<EditAccount />} />
+          <Route path="/update-password" element={<UpdatePass />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/transactions" element={<Transactions />} />
         </Route>
       </Routes>
     </BrowserRouter>

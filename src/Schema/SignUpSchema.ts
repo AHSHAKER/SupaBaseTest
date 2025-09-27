@@ -13,3 +13,11 @@ export const signupSchema = z.object({
   message: "Passwords do not match",
   path: ["confirmPassword"],
 });
+
+export const updateAccountSchema = z.object({
+  full_name: z.string().optional(),
+  phone: z.string().min(8, "Phone number must be at least 8 digits").optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+});

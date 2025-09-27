@@ -1,17 +1,6 @@
 import { signOut } from "../hooks/useAuth";
-import { useProfile } from "../hooks/useProfile";
+import useAuthStore from "../Store/authStore";
 import { useNavigate } from "react-router-dom";
-
-
-type Profile = {
-  full_name?: string | null
-  email?: string | null
-  phone?: string | null
-  address?: string | null
-  city?: string | null
-  country?: string | null
-  plan?: string | null
-}
 
 const getInitials = (name?: string | null, email?: string | null) => {
     
@@ -27,34 +16,18 @@ const getInitials = (name?: string | null, email?: string | null) => {
   return "U"
 }
 
+
 const Profile = () => {
-  const { profile, loading, error } = useProfile();
+  const profile = useAuthStore((state) => state);
   const Nav = useNavigate();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600">
-        <div className="text-white/90">Loading...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600">
-        <div className="rounded-lg bg-white/10 p-6">
-          <div className="text-red-200">Error: {error}</div>
-        </div>
-      </div>
-    )
-  }
 
   const displayName = profile?.full_name || profile?.email || "User"
-  const plan = profile?.plan || "Free"
+  const planName = profile?.plan?.code || "Free"
   const initials = getInitials(profile?.full_name, profile?.email)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600 p-6">
+    <div className="min-h-80% flex items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600 p-6">
       <div className="w-full max-w-3xl bg-white/95 dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Left: profile summary */}
@@ -85,15 +58,23 @@ const Profile = () => {
                 <path d="M12 22v-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              {plan}
+              {planName}
             </div>
 
-            <button
-              onClick={() => signOut()}
-              className="mt-6 w-full md:w-auto px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
-            >
-              Sign Out
-            </button>
+            <div className="mt-4 flex flex-wrap gap-5">
+              <button
+                onClick={() => Nav("/edit-account")}
+                className="px-4 py-2 rounded-lg bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition"
+              >
+                Edit Account
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
 
           {/* Right: details */}
@@ -135,7 +116,7 @@ const Profile = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-xs text-slate-400">Subscription</div>
-                    <div className="mt-1 font-medium">{plan}</div>
+                    <div className="mt-1 font-medium">{planName}</div>
                   </div>
                   <div>
                     <button 
