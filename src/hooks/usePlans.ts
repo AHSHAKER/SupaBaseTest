@@ -7,6 +7,18 @@ import useAuthStore from '../Store/authStore'
 
 export type Plan = Tables<'plans'>
 
+export const getActivePlan = async () => {
+    const userId = useAuthStore.getState().user_id;
+    const { data: planData, error: planError } = await supabase
+        .from("subscriptions")
+        .select(`*, plans(*)`)
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .maybeSingle();
+    if (planError) throw planError;
+    return { planData, planError };
+};
+
 export function usePlans() {
     const [plans, setPlans] = useState<Plan[]>([])
     const [loading, setLoading] = useState<boolean>(true)
@@ -100,17 +112,14 @@ export const subscribeToPlan = async (plan: { planId: string; plan_code: string;
     }
 }
 
-export const cancelSubscription = async (planId: string, planName: string) => {
+export const cancelSubscription = async (planName: string) => {
     const user_id = useAuthStore.getState().user_id;
     if (!user_id) throw new Error("User not authenticated");
-
-    console.log("Cancelling subscription:", planId);
 
     try {
         const { data, error } = await supabase
             .from('subscriptions')
             .update({ status: 'canceled' })
-            .eq('plan_id', planId)
             .eq('user_id', user_id)
             .eq('status', 'active')
             .select('subscription_id')

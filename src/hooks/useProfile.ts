@@ -1,6 +1,7 @@
 import supabase from "../SupabaseUsers";
 import type { Tables } from "../../database.types";
 import useAuthStore from "../Store/authStore";
+import { getActivePlan } from "./usePlans";
 
 export type AccountForm = Omit<
   Tables<"accounts">,
@@ -31,14 +32,7 @@ export async function setProfile(): Promise<void> {
     }
 
     // console.log("Account Data:", accountData);
-
-    const { data: planData, error: planError } = await supabase
-      .from("subscriptions")
-      .select("plan_id, status, plans(name, code)")
-      .eq("user_id", userId)
-      .eq("status", "active") 
-      .maybeSingle();
-
+    const { planData, planError } = await getActivePlan();
     if (planError || !planData) {
       setProfile({
         ...accountData,

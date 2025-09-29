@@ -33,10 +33,10 @@ const Plans = () => {
   };
 
   /** Cancel subscription */
-  const handleCancel = async (planId: string, planName: string) => {
+  const handleCancel = async ( planName: string) => {
     if (!window.confirm("Are you sure you want to cancel your subscription?")) return;
 
-    const { errorC } = await cancelSubscription(planId, planName);
+    const { errorC } = await cancelSubscription(planName);
     if (errorC) {
       alert("Error canceling subscription: " + errorC);
       return;
@@ -94,7 +94,7 @@ const Plans = () => {
                     Currently Subscribed
                   </div>
                   <button
-                    onClick={() => handleCancel(plan.plan_id, plan.name)}
+                    onClick={() => handleCancel(plan.name)}
                     className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                   >
                     Cancel Subscription

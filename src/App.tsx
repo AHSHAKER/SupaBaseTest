@@ -9,6 +9,9 @@ import ResetPass from './Pages/ResetPass'
 import UpdatePass from './Pages/updatepass'
 import Plans from './Pages/Plans'
 import Transactions from './Pages/Transactions'
+import UserUsage from './Pages/UserUsage'
+import TicketsPage from './Pages/Tickets/TicketsPage'
+import CreateTicketForm from './Pages/Tickets/CreateTicketForm'
 
 function App() {
 
@@ -27,6 +30,11 @@ function App() {
           <Route path="/update-password" element={<UpdatePass />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/usage" element={<UserUsage />} />
+          <Route path="/ticket" element={<TicketsPage />}>
+            <Route path=":ticketId" element={<TicketsPage />} />
+            <Route path="new" element={<CreateTicketForm onClose={() => { }} />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
