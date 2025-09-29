@@ -15,9 +15,9 @@ export const signupSchema = z.object({
 });
 
 export const updateAccountSchema = z.object({
-  full_name: z.string().optional(),
-  phone: z.string().min(8, "Phone number must be at least 8 digits").optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().optional(),
+  full_name: z.string().optional().nullable(),
+  phone: z.string().min(8, "Phone number must be at least 8 digits").optional().nullable(),
+  address: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
 });

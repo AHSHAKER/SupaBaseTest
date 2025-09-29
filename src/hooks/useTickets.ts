@@ -3,6 +3,8 @@ import useAuthStore from "../Store/authStore";
 import supabase from "../SupabaseUsers";
 import type { Tables } from "../../database.types";
 
+const user_id = useAuthStore.getState().user_id;
+
 interface CreateTicketArgs {
     p_initial_message: string;
     p_subject: string;
@@ -18,7 +20,7 @@ interface AddTicketMessageArgs {
 
 export type Ticket = Tables<"tickets">;
 
-const user_id = useAuthStore.getState().user_id;
+console.log("Store: ", useAuthStore.getState());
 
 export const createTicket = async (TicketArgs: CreateTicketArgs) => {
   const { data, error } = await supabase.rpc("create_ticket", {
@@ -43,7 +45,7 @@ export const addTicketMessage = async (MessageArgs: AddTicketMessageArgs) => {
         p_sender_id: MessageArgs.p_sender_id,
         p_sender_role: MessageArgs.p_sender_role,
         p_ticket_id: MessageArgs.p_ticket_id,
-        p_attachments: MessageArgs.p_attachments || {},
+        p_attachments: MessageArgs.p_attachments || [],
     });
 
     if (error) throw error;

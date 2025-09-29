@@ -8,7 +8,8 @@ import useAuthStore from '../Store/authStore'
 export type Plan = Tables<'plans'>
 
 export const getActivePlan = async () => {
-    const userId = useAuthStore.getState().user_id;
+    const userId = await supabase.auth.getUser().then(({ data }) => data.user?.id);
+    if (!userId) throw new Error("User not authenticated");
     const { data: planData, error: planError } = await supabase
         .from("subscriptions")
         .select(`*, plans(*)`)

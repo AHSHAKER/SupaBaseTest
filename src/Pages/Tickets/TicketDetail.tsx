@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { addTicketMessage, getTicketMessages } from "../../hooks/useTickets";
 import type { Ticket } from "../../hooks/useTickets";
+import supabase from "../../SupabaseUsers";
 
 interface Props {
   ticket: Ticket;
@@ -21,7 +22,23 @@ const TicketDetail = ({ ticket, onClose }: Props) => {
     };
   useEffect(() => {
     fetchMessages();
-    console.log("Ticket id:", ticket.ticket_id);
+  }, [ticket.ticket_id]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("ticket-messages")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "support_messages", filter: `ticket_id=eq.${ticket.ticket_id}` },
+        (payload) => {
+          setMessages((prev) => [...prev, payload.new]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [ticket.ticket_id]);
 
   
@@ -54,17 +71,27 @@ const TicketDetail = ({ ticket, onClose }: Props) => {
           ))}
         </div>
 
-        <div className="p-4 border-t flex space-x-2">
-          <input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a reply..."
-            className="flex-1 border p-2 rounded"
-          />
-          <button onClick={handleSend} className="px-3 py-1 bg-blue-600 text-white rounded cursor-pointer">
-            Send
-          </button>
-        </div>
+        {ticket.status === "closed" ? (
+  <div className="p-4 border-t text-red-500 text-sm">
+    🚫 This ticket is closed. You can no longer send messages.
+  </div>
+) : (
+  <div className="p-4 border-t flex space-x-2">
+    <input
+      value={newMessage}
+      onChange={(e) => setNewMessage(e.target.value)}
+      placeholder="Type a reply..."
+      className="flex-1 border p-2 rounded"
+    />
+    <button
+      onClick={handleSend}
+      className="px-3 py-1 bg-blue-600 text-white rounded cursor-pointer"
+    >
+      Send
+    </button>
+  </div>
+)}
+
       </div>
     </div>
   );

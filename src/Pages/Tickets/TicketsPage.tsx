@@ -4,6 +4,7 @@ import type { Ticket } from "../../hooks/useTickets";
 import TicketDetail from "./TicketDetail";
 import CreateTicketForm from "./CreateTicketForm";
 import LoadingSpinner from "../../Components/Randoms/LoadingSpinner";
+import supabase from "../../SupabaseUsers";
 
 const TicketsPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -27,12 +28,45 @@ const TicketsPage = () => {
     fetchTickets();
   }, []);
 
+  // inside TicketsPage
+  useEffect(() => {
+    const channel = supabase
+      .channel("tickets-changes")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "tickets" },
+        (payload) => {
+          const updatedTicket: Ticket = payload.new as Ticket;
+
+          setTickets((prev) =>
+            prev.map((t) =>
+              t.ticket_id === updatedTicket.ticket_id ? updatedTicket : t
+            )
+          );
+
+          if (
+            selectedTicket &&
+            selectedTicket.ticket_id === updatedTicket.ticket_id
+          ) {
+            setSelectedTicket(updatedTicket);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedTicket]);
+
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">🎫 My Tickets</h1>
         <button
           onClick={() => setShowCreate(true)}
+          
           className="bg-blue-600 text-white px-4 py-2 rounded-lg"
         >
           + New Ticket
@@ -74,7 +108,7 @@ const TicketsPage = () => {
         <TicketDetail ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />
       )}
 
-      {showCreate && <CreateTicketForm onClose={() => setShowCreate(false)} />}
+      {showCreate && <CreateTicketForm onClose={() => {setShowCreate(false); fetchTickets();}} />}
     </div>
   );
 };

@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { updateAccount } from "../hooks/useProfile";
+import { setProfile, updateAccount } from "../hooks/useProfile";
 import type { AccountForm } from "../hooks/useProfile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateAccountSchema } from "../Schema/SignUpSchema";
 import useAuthStore from "../Store/authStore";
-
 
 
 const EditAccount: React.FC = () => {
@@ -44,7 +43,7 @@ const EditAccount: React.FC = () => {
         return;
       }
       alert("Account updated!");
-      Nav("/profile");
+      Nav("/");
     } catch (err) {
       console.error("Failed to update account:", err);
     }
@@ -116,6 +115,7 @@ const EditAccount: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
+          onClick={() => setProfile()}
           className="mt-6 w-full py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-70"
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
