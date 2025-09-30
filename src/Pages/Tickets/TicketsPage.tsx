@@ -28,7 +28,6 @@ const TicketsPage = () => {
     fetchTickets();
   }, []);
 
-  // inside TicketsPage
   useEffect(() => {
     const channel = supabase
       .channel("tickets-changes")
@@ -59,56 +58,60 @@ const TicketsPage = () => {
     };
   }, [selectedTicket]);
 
-
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">🎫 My Tickets</h1>
-        <button
-          onClick={() => setShowCreate(true)}
-          
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-        >
-          + New Ticket
-        </button>
-      </div>
-
-      {loading && <LoadingSpinner />}
-      {!loading && tickets.length === 0 && (
-        <p className="text-gray-500">You have no tickets. Click "New Ticket" to create one.</p>
-      )}
-
-      {!loading && tickets.length > 0 && (
-        <div className="space-y-3">
-          {tickets.map((t) => (
-            <div
-              key={t.ticket_id}
-              onClick={() => setSelectedTicket(t)}
-              className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-            >
-              <div className="flex justify-between">
-                <h2 className="font-semibold">{t.subject}</h2>
-                <span
-                  className={`px-2 py-1 text-xs rounded ${
-                    t.status === "open" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {t.status}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">
-                Priority: {t.priority} • Last updated {new Date(t.updated_at).toLocaleString()}
-              </p>
-            </div>
-          ))}
+    <div className="bg-slate-50 flex flex-col items-center p-6">
+      <div className="w-full max-w-6xl">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-slate-800">🎫 My Tickets</h1>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+          >
+            + New Ticket
+          </button>
         </div>
-      )}
 
-      {selectedTicket && (
-        <TicketDetail ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />
-      )}
+        {loading && <LoadingSpinner />}
+        {!loading && tickets.length === 0 && (
+          <div className="py-12 text-center text-slate-400 text-lg">
+            You have no tickets yet. Click <span className="font-semibold text-blue-600">New Ticket</span> to create one. 🚀
+          </div>
+        )}
 
-      {showCreate && <CreateTicketForm onClose={() => {setShowCreate(false); fetchTickets();}} />}
+        {!loading && tickets.length > 0 && (
+          <div className="space-y-4">
+            {tickets.map((t) => (
+              <div
+                key={t.ticket_id}
+                onClick={() => setSelectedTicket(t)}
+                className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition"
+              >
+                <div className="flex justify-between items-center">
+                  <h2 className="font-semibold text-slate-800">{t.subject}</h2>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ring-1 ${
+                      t.status === "open"
+                        ? "bg-green-100 text-green-700 ring-green-300"
+                        : "bg-slate-100 text-slate-700 ring-slate-300"
+                    }`}
+                  >
+                    {t.status.charAt(0).toUpperCase() + t.status.slice(1)}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-500 mt-1">
+                  Priority: {t.priority} • Last updated {new Date(t.updated_at).toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {selectedTicket && (
+          <TicketDetail ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />
+        )}
+
+        {showCreate && <CreateTicketForm onClose={() => {setShowCreate(false); fetchTickets();}} />}
+      </div>
     </div>
   );
 };

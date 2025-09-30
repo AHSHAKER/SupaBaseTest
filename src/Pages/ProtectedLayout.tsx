@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import supabase from "../SupabaseUsers";
+import LoadingSpinner from "../Components/Randoms/LoadingSpinner";
 
 const ProtectedLayout: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,6 @@ const ProtectedLayout: React.FC = () => {
         if (mounted) setLoading(false);
       });
 
-    // listen for auth changes (optional but useful)
     const { data: { subscription } = { subscription: undefined } } =
       supabase.auth.onAuthStateChange((_event, newSession) => {
         if (!mounted) return;
@@ -34,9 +34,7 @@ const ProtectedLayout: React.FC = () => {
   }, []);
 
   if (loading) {
-    // show nothing or a spinner while checking auth
-    <div className="min-h-screen flex items-center justify-center">Loading...</div>
-    return null;
+    return <LoadingSpinner />;
   }
 
   if (!session) {

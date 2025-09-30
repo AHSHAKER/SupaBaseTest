@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { setProfile, updateAccount } from "../hooks/useProfile";
+import { updateAccount } from "../hooks/useProfile";
 import type { AccountForm } from "../hooks/useProfile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateAccountSchema } from "../Schema/SignUpSchema";
 import useAuthStore from "../Store/authStore";
 
-
 const EditAccount: React.FC = () => {
   const profile = useAuthStore((state) => state);
+  const setProfile = useAuthStore((state) => state.setProfile); // <-- get setProfile
   const Nav = useNavigate();
 
   const {
@@ -42,6 +42,14 @@ const EditAccount: React.FC = () => {
         alert(message);
         return;
       }
+      setProfile({
+        ...profile,
+        full_name: formData.full_name ?? undefined,
+        phone: formData.phone ?? undefined,
+        address: formData.address ?? undefined,
+        city: formData.city ?? undefined,
+        country: formData.country ?? undefined,
+      });
       alert("Account updated!");
       Nav("/");
     } catch (err) {
@@ -50,18 +58,18 @@ const EditAccount: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md bg-white/90 p-8 rounded shadow-md"
+        className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-slate-200"
         noValidate
       >
-        <h2 className="text-2xl font-bold mb-6 text-indigo-700">Edit Account</h2>
+        <h2 className="text-2xl font-bold mb-6 text-slate-800 text-center">Edit Account</h2>
         <label className="block mb-4">
-          <span className="text-sm">Full Name</span>
+          <span className="text-sm text-slate-700">Full Name</span>
           <input
             {...register("full_name")}
-            className={`mt-1 w-full px-3 py-2 rounded bg-indigo-100 text-indigo-700 ${errors.full_name ? "border border-red-400" : ""}`}
+            className={`mt-1 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${errors.full_name ? "border-red-400" : ""}`}
             placeholder="Full Name"
           />
           {errors.full_name && (
@@ -69,10 +77,10 @@ const EditAccount: React.FC = () => {
           )}
         </label>
         <label className="block mb-4">
-          <span className="text-sm">Phone</span>
+          <span className="text-sm text-slate-700">Phone</span>
           <input
             {...register("phone")}
-            className={`mt-1 w-full px-3 py-2 rounded bg-indigo-100 text-indigo-700 ${errors.phone ? "border border-red-400" : ""}`}
+            className={`mt-1 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${errors.phone ? "border-red-400" : ""}`}
             placeholder="Phone"
           />
           {errors.phone && (
@@ -80,10 +88,10 @@ const EditAccount: React.FC = () => {
           )}
         </label>
         <label className="block mb-4">
-          <span className="text-sm">Address</span>
+          <span className="text-sm text-slate-700">Address</span>
           <input
             {...register("address")}
-            className={`mt-1 w-full px-3 py-2 rounded bg-indigo-100 text-indigo-700 ${errors.address ? "border border-red-400" : ""}`}
+            className={`mt-1 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${errors.address ? "border-red-400" : ""}`}
             placeholder="Address"
           />
           {errors.address && (
@@ -91,10 +99,10 @@ const EditAccount: React.FC = () => {
           )}
         </label>
         <label className="block mb-4">
-          <span className="text-sm">City</span>
+          <span className="text-sm text-slate-700">City</span>
           <input
             {...register("city")}
-            className={`mt-1 w-full px-3 py-2 rounded bg-indigo-100 text-indigo-700 ${errors.city ? "border border-red-400" : ""}`}
+            className={`mt-1 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${errors.city ? "border-red-400" : ""}`}
             placeholder="City"
           />
           {errors.city && (
@@ -102,10 +110,10 @@ const EditAccount: React.FC = () => {
           )}
         </label>
         <label className="block mb-4">
-          <span className="text-sm">Country</span>
+          <span className="text-sm text-slate-700">Country</span>
           <input
             {...register("country")}
-            className={`mt-1 w-full px-3 py-2 rounded bg-indigo-100 text-indigo-700 ${errors.country ? "border border-red-400" : ""}`}
+            className={`mt-1 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition ${errors.country ? "border-red-400" : ""}`}
             placeholder="Country"
           />
           {errors.country && (
@@ -115,8 +123,7 @@ const EditAccount: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          onClick={() => setProfile()}
-          className="mt-6 w-full py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-70"
+          className="mt-6 w-full py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition disabled:opacity-60"
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
         </button>

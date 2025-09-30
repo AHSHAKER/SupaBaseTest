@@ -34,60 +34,60 @@ const SignIn: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-green-500 text-white items-center justify-center font-sans text-center">
+    <div className="min-h-screen flex bg-slate-50 items-center justify-center font-sans">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md bg-white/10 p-8 rounded-md shadow-md"
+        className="w-full max-w-md sm:bg-white p-8 sm:rounded-2xl sm:shadow-lg sm:border border-slate-200"
         noValidate
       >
-        <h1 className="text-4xl font-semibold mb-4">Sign In</h1>
-        <p className="mb-6 text-white/80">Please sign in to your account.</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-4">Sign In</h1>
+        <p className="mb-6 text-slate-500">Please sign in to your account.</p>
 
         <div className="mb-4 text-left">
-          <label className="block mb-1 text-sm">Email</label>
+          <label className="block mb-1 text-sm text-slate-700">Email</label>
           <input
             type="email"
             {...register("email", {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
             })}
-            className="w-full px-3 py-2 rounded bg-white/20 border border-white/30 focus:outline-none"
+            className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
           />
           {errors.email && (
-            <p className="mt-1 text-xs text-red-200">{errors.email.message}</p>
+            <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
           )}
         </div>
 
         <div className="mb-6 text-left">
-          <label className="block mb-1 text-sm">Password</label>
+          <label className="block mb-1 text-sm text-slate-700">Password</label>
           <input
             type="password"
             {...register("password", {
               required: "Password is required",
               minLength: { value: 6, message: "Minimum length is 6" },
             })}
-            className="w-full px-3 py-2 rounded bg-white/20 border border-white/30 focus:outline-none"
+            className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
           />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-200">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-2 rounded bg-white text-green-700 font-semibold hover:opacity-90 disabled:opacity-60"
+          className="w-full py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition disabled:opacity-60"
         >
           {isSubmitting ? "Signing in..." : "Sign In"}
         </button>
-        <p className="mt-4 text-center text-sm text-white/80">
+        <p className="mt-4 text-center text-sm text-slate-500">
           Don't have an account?{" "}
-          <a href="/sign-up" className="underline hover:text-white">
+          <a href="/sign-up" className="underline hover:text-blue-700">
             Sign Up
           </a>
         </p>
-        <p className="mt-2 text-center text-sm text-white/80">
-          <a href="/reset-password" className="underline hover:text-white">
+        <p className="mt-2 text-center text-sm text-slate-500">
+          <a href="/reset-password" className="underline hover:text-blue-700">
             Forgot your password?
           </a>
         </p>

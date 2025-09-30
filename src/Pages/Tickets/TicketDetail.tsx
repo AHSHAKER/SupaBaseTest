@@ -9,17 +9,17 @@ interface Props {
 }
 
 const TicketDetail = ({ ticket, onClose }: Props) => {
-    const [messages, setMessages] = useState<any[]>([]);
-    const [newMessage, setNewMessage] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState("");
 
-    const fetchMessages = async () => {
-        try {
-            const msgs = await getTicketMessages(ticket.ticket_id);
-            setMessages(msgs);
-        } catch (error) {
-            console.error("Error fetching ticket messages:", error);
-        }
-    };
+  const fetchMessages = async () => {
+    try {
+      const msgs = await getTicketMessages(ticket.ticket_id);
+      setMessages(msgs);
+    } catch (error) {
+      console.error("Error fetching ticket messages:", error);
+    }
+  };
   useEffect(() => {
     fetchMessages();
   }, [ticket.ticket_id]);
@@ -41,7 +41,6 @@ const TicketDetail = ({ ticket, onClose }: Props) => {
     };
   }, [ticket.ticket_id]);
 
-  
   const handleSend = async () => {
     if (!newMessage.trim()) return;
     const msg = await addTicketMessage({
@@ -55,43 +54,57 @@ const TicketDetail = ({ ticket, onClose }: Props) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex justify-center items-center">
-      <div className="bg-white rounded-lg shadow-lg w-[600px] h-[500px] flex flex-col">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-lg font-semibold">{ticket.subject}</h2>
-          <button onClick={onClose} className="text-gray-500 cursor-pointer">✖</button>
+    <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-xl h-[500px] flex flex-col border border-slate-200">
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-slate-800">{ticket.subject}</h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 rounded-full p-2 transition"
+            aria-label="Close"
+          >
+            ✖
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
           {messages.map((m, i) => (
-            <div key={i} className="p-3 rounded-lg bg-gray-100">
-              <p className="text-sm font-semibold">{m.sender_role}</p>
-              <p>{m.message_text}</p>
+            <div key={i} className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+              <div className="mb-1 flex items-center gap-2">
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                  m.sender_role === "customer"
+                    ? "bg-blue-50 text-blue-600"
+                    : "bg-slate-50 text-slate-500"
+                }`}>
+                  {m.sender_role === "customer" ? "You" : "Agent"}
+                </span>
+                <span className="text-xs text-slate-400">{m.created_at ? new Date(m.created_at).toLocaleString() : ""}</span>
+              </div>
+              <div className="text-slate-700">{m.message_text}</div>
             </div>
           ))}
         </div>
 
         {ticket.status === "closed" ? (
-  <div className="p-4 border-t text-red-500 text-sm">
-    🚫 This ticket is closed. You can no longer send messages.
-  </div>
-) : (
-  <div className="p-4 border-t flex space-x-2">
-    <input
-      value={newMessage}
-      onChange={(e) => setNewMessage(e.target.value)}
-      placeholder="Type a reply..."
-      className="flex-1 border p-2 rounded"
-    />
-    <button
-      onClick={handleSend}
-      className="px-3 py-1 bg-blue-600 text-white rounded cursor-pointer"
-    >
-      Send
-    </button>
-  </div>
-)}
-
+          <div className="p-6 border-t border-slate-100 text-red-500 text-sm text-center">
+            🚫 This ticket is closed. You can no longer send messages.
+          </div>
+        ) : (
+          <div className="p-6 border-t border-slate-100 flex space-x-2 bg-white">
+            <input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a reply..."
+              className="flex-1 border border-slate-200 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+            />
+            <button
+              onClick={handleSend}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+            >
+              Send
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

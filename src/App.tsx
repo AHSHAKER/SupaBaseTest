@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Dashboard from './Pages/Dashboard'
+import Layout from './Pages/Layout'
 import SignIn from './Pages/SignIn'
 import SignUp from './Pages/SignUp'
 import ProtectedLayout from './Pages/ProtectedLayout'
@@ -24,16 +24,17 @@ function App() {
 
         {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
-          <Route index path="/" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/edit-account" element={<EditAccount />} />
           <Route path="/update-password" element={<UpdatePass />} />
-          <Route path="/plans" element={<Plans />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/usage" element={<UserUsage />} />
-          <Route path="/ticket" element={<TicketsPage />}>
-            <Route path=":ticketId" element={<TicketsPage />} />
-            <Route path="new" element={<CreateTicketForm onClose={() => { }} />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Profile />} />
+            <Route path="/edit-account" element={<EditAccount />} />
+            <Route path="/plans" element={<Plans />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/usage" element={<UserUsage />} />
+            <Route path="/ticket" element={<TicketsPage />}>
+              <Route path=":ticketId" element={<TicketsPage />} />
+              <Route path="new" element={<CreateTicketForm onClose={() => { }} />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

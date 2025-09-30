@@ -14,6 +14,7 @@ export async function signUp(formData: SignUpValues) {
         city: formData.city ?? null,
         country: formData.country ?? null,
       },
+      emailRedirectTo: `${window.location.origin}/sign-in`,
     },
   });
 }

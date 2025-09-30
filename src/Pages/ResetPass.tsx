@@ -22,25 +22,30 @@ const ResetPassword: React.FC = () => {
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage("We sent you a reset link. Please check your email.");
+      const { data } = await supabase.from("accounts").select("*").eq("email", email).maybeSingle();
+      if (!data) {
+        setMessage("No account found with that email.");
+      } else {
+        setMessage("We sent you a reset link. Please check your email.");
+      }
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-yellow-500 text-white">
+    <div className="min-h-screen flex bg-slate-50 items-center justify-center font-sans">
       <form
         onSubmit={handleReset}
-        className="bg-yellow-600/90 p-8 rounded-md w-full max-w-md"
+        className="w-full max-w-md sm:bg-white p-8 sm:rounded-2xl sm:shadow-lg sm:border border-slate-200"
       >
-        <h1 className="text-2xl font-bold text-center">Reset Password</h1>
-        <p className="text-sm text-center text-white/80 mt-2">
+        <h1 className="text-2xl font-bold text-slate-800 text-center">Reset Password</h1>
+        <p className="text-sm text-center text-slate-500 mt-2">
           Enter your email to receive a reset link.
         </p>
 
         <input
           type="email"
-          className="mt-4 w-full px-3 py-2 rounded bg-yellow-700 placeholder-yellow-300 focus:outline-none"
+          className="mt-4 w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -49,12 +54,14 @@ const ResetPassword: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="mt-6 w-full py-2 rounded bg-white text-yellow-600 font-semibold hover:opacity-95 disabled:opacity-70"
+          className="mt-6 w-full py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition disabled:opacity-60"
         >
           {loading ? "Sending..." : "Send reset link"}
         </button>
 
-        {message && <p className="mt-4 text-center">{message}</p>}
+        {message && (
+          <p className="mt-4 text-center text-sm text-slate-500">{message}</p>
+        )}
       </form>
     </div>
   );
