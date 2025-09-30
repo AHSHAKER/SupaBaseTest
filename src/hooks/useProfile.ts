@@ -7,7 +7,6 @@ export type AccountForm = Omit<
   TablesUpdate<"accounts">,
   "user_id" | "created_at" | "updated_at" | "email" | "metadata"
 >;
-
 export async function setProfile(): Promise<void> {
   const setProfile = useAuthStore.getState().setProfile;
 
@@ -61,7 +60,6 @@ export async function setProfile(): Promise<void> {
   console.log("store:", useAuthStore.getState());
 }
 
-
 export async function updateAccount(formData: AccountForm) {
   const userId = useAuthStore.getState().user_id;
   const { error } = await supabase
@@ -70,3 +68,30 @@ export async function updateAccount(formData: AccountForm) {
     .eq("user_id", userId);
   return { error };
 }
+
+export const getPendingSubscriptions = async () => {
+  const user_id = useAuthStore.getState().user_id;
+  if (!user_id) throw new Error("User not authenticated");
+
+  try {
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user_id)
+      .eq("status", "pending")
+      .maybeSingle();
+
+      if(!data) { return { data: null, planData: null, errorS: null }; }
+    if (error) throw error;
+
+    const { data: planData } = await supabase
+      .from('plans')
+      .select('*')
+      .eq('plan_id', data?.plan_id)
+      .single();
+
+    return { data, planData, errorS: null };
+  } catch (err: any) {
+    return { data: null, planData: null, errorS: err.message || 'Failed to fetch pending subscriptions' };
+  }
+};

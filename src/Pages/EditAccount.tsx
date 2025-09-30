@@ -6,11 +6,13 @@ import type { AccountForm } from "../hooks/useProfile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateAccountSchema } from "../Schema/SignUpSchema";
 import useAuthStore from "../Store/authStore";
+import { toast } from "react-toastify";
 
 const EditAccount: React.FC = () => {
   const profile = useAuthStore((state) => state);
   const setProfile = useAuthStore((state) => state.setProfile); // <-- get setProfile
   const Nav = useNavigate();
+  const notify = (message: string) => toast(message);
 
   const {
     register,
@@ -39,7 +41,7 @@ const EditAccount: React.FC = () => {
       if (error) {
         const message =
           typeof error === "string" ? error : (error?.message ?? JSON.stringify(error));
-        alert(message);
+        notify(message);
         return;
       }
       setProfile({
@@ -50,7 +52,7 @@ const EditAccount: React.FC = () => {
         city: formData.city ?? undefined,
         country: formData.country ?? undefined,
       });
-      alert("Account updated!");
+      notify("Account updated!");
       Nav("/");
     } catch (err) {
       console.error("Failed to update account:", err);

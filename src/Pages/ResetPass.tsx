@@ -1,32 +1,32 @@
 import React, { useState } from "react";
 import supabase from "../SupabaseUsers";
+import { toast } from "react-toastify";
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
+  const notify = (message: string) => toast(message);
+  
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setMessage("Please enter your email address.");
+      notify("Please enter your email address.");
       return;
     }
     setLoading(true);
-    setMessage("");
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: "http://localhost:3000/update-password",
     });
 
     if (error) {
-      setMessage(error.message);
+      notify(error.message);
     } else {
       const { data } = await supabase.from("accounts").select("*").eq("email", email).maybeSingle();
       if (!data) {
-        setMessage("No account found with that email.");
+        notify("No account found with that email.");
       } else {
-        setMessage("We sent you a reset link. Please check your email.");
+        notify("We sent you a reset link. Please check your email.");
       }
     }
     setLoading(false);
@@ -58,10 +58,6 @@ const ResetPassword: React.FC = () => {
         >
           {loading ? "Sending..." : "Send reset link"}
         </button>
-
-        {message && (
-          <p className="mt-4 text-center text-sm text-slate-500">{message}</p>
-        )}
       </form>
     </div>
   );

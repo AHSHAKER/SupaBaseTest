@@ -5,6 +5,7 @@ import { signupSchema } from "../Schema/SignUpSchema";
 import { signUp } from "../hooks/useAuth";
 import type { SignUpValues } from "../Interfaces/UseAuthI";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUp: React.FC = () => {
   const Nav = useNavigate();
@@ -16,6 +17,7 @@ const SignUp: React.FC = () => {
   } = useForm<SignUpValues>({
     resolver: zodResolver(signupSchema),
   });
+  const notify = (message: string) => toast(message);
 
   const onSubmit = async (formData: SignUpValues) => {
     try {
@@ -24,15 +26,15 @@ const SignUp: React.FC = () => {
 
       if (error) {
         console.error("Sign up error:", error);
-        alert(error.message);
+        notify(error.message);
         return;
       }
 
-      alert("We sent you a confirmation email. Please check your inbox to verify your account before signing in.");
+      notify("We sent you a confirmation email. Please check your inbox to verify your account before signing in.");
       Nav("/sign-in");
     } catch (err) {
       console.error(err);
-      alert("An unexpected error occurred.");
+      notify("An unexpected error occurred.");
     }
   };
 

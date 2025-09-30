@@ -4,6 +4,7 @@ import { signIn } from "../hooks/useAuth"
 import type { SignInValues } from "../Interfaces/UseAuthI"
 import { useNavigate } from "react-router-dom"
 import { setProfile } from "../hooks/useProfile"
+import { toast } from "react-toastify"
 
 const SignIn: React.FC = () => {
   const Nav = useNavigate()
@@ -15,13 +16,14 @@ const SignIn: React.FC = () => {
     defaultValues: { email: "", password: "" },
   })
 
+  const notify = (message: string) => toast(message);
   const onSubmit = async (formData: SignInValues) => {
     try {
       const { error } = await signIn(formData)
 
       if (error) {
         console.error("Sign in error:", error)
-        alert(error.message)
+        notify(error.message)
         return
       }
 
@@ -29,7 +31,7 @@ const SignIn: React.FC = () => {
       Nav("/")
     } catch (err) {
       console.error(err)
-      alert("An unexpected error occurred.")
+      notify("An unexpected error occurred.")
     }
   }
 

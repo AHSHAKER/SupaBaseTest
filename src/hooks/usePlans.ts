@@ -8,9 +8,14 @@ import useAuthStore from '../Store/authStore'
 export type Plan = Tables<'plans'>
 
 export const getActivePlan = async () => {
-    const userId = useAuthStore.getState().user_id;
-    if (!userId) {await supabase.auth.getUser().then(({ data }) => data.user?.id);} 
-    if(!userId) throw new Error("User not authenticated");
+    let userId = useAuthStore.getState().user_id;
+    if (!userId) {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        userId = data.user?.id;
+    }
+
+  if (!userId) throw new Error("User not authenticated");
     const { data: planData, error: planError } = await supabase
         .from("subscriptions")
         .select(`*, plans(*)`)
@@ -23,11 +28,9 @@ export const getActivePlan = async () => {
 
 export function usePlans() {
     const [plans, setPlans] = useState<Plan[]>([])
-    const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
 
     const fetchPlans = useCallback(async () => {
-        setLoading(true)
         setError(null)
 
         try {
@@ -45,8 +48,6 @@ export function usePlans() {
         } catch (err: any) {
             setPlans([])
             setError(err.message)
-        } finally {
-            setLoading(false)
         }
     }, [])
 
@@ -58,49 +59,58 @@ export function usePlans() {
 
     return {
         plans,
-        loading,
         error,
         refresh: fetchPlans,
     }
 }
 
-export const subscribeToPlan = async (plan: { planId: string; plan_code: string; plan_duration: string; plan_price: number; plan_name: string }, auto_renew: boolean) => {
+export const createSubscription = async (planId: string, auto_renew: boolean) => {
     const user_id = useAuthStore.getState().user_id;
     if (!user_id) throw new Error("User not authenticated");
-    const today = new Date();
-    const created_at = today.toISOString();
-    const current_date = created_at.split('T')[0];
-    const cancel_at = new Date(today);
-
-    if (plan.plan_duration === "monthly") {
-        cancel_at.setMonth(cancel_at.getMonth() + 1);
-    } else {
-        cancel_at.setFullYear(cancel_at.getFullYear() + 1);
-    }
-    
     try {
         const { data, error } = await supabase
             .from('subscriptions')
-            .insert({ plan_id: plan.planId, status: 'active', user_id: user_id, start_date: current_date, created_at: created_at, current_period_end: cancel_at, auto_renew: auto_renew })
+            .insert({ plan_id: planId, status: 'pending', user_id: user_id, auto_renew: auto_renew })
             .select('subscription_id')
             .single();
 
         if (error) throw error;
 
+        return { data, errorS: null };
+    } catch (err: any) {
+        return { data: null, errorS: err.message || 'Subscription failed' };
+    }
+}
+
+export const activateSubscription = async (subscriptionId: string, plan: Plan) => {
+    const user_id = useAuthStore.getState().user_id;
+    if (!user_id) throw new Error("User not authenticated");
+
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .update({ status: 'active' })
+            .eq('subscription_id', subscriptionId)
+            .select('subscription_id, plan_id')
+            .single();
+
+        if (error) throw error;
+
+        
         const transaction: transaction = {
             user_id: user_id,
             status: 'succeeded',
             subscription_id: data?.subscription_id,
             currency: 'USD',
-            amount: plan.plan_price,
+            amount: plan.price_amount,
             event_type: 'payment',
-            description: `Subscribed to plan ${plan.plan_name} for ${plan.plan_duration}`,
+            description: `Subscribed to plan ${plan.name} for ${plan.billing_period}`,
         };
 
         const newPlan = {
-            name: plan.plan_name,
-            code: plan.plan_code,
-            id: plan.planId,
+            name: plan.name,
+            code: plan.code,
+            id: plan.plan_id,
             status: 'active' as 'active',
         };
 
@@ -110,9 +120,9 @@ export const subscribeToPlan = async (plan: { planId: string; plan_code: string;
 
         return { data, errorS: null };
     } catch (err: any) {
-        return { data: null, errorS: err.message || 'Subscription failed' };
+        return { data: null, errorS: err.message || 'Failed to activate subscription' };
     }
-}
+}        
 
 export const cancelSubscription = async (planName: string) => {
     const user_id = useAuthStore.getState().user_id;
@@ -146,5 +156,23 @@ export const cancelSubscription = async (planName: string) => {
         return { data, errorC: null };
     } catch (err: any) {
         return { data: null, errorC: err.message || 'Cancellation failed' };
+    }
+}
+
+export const deleteSubscription = async (subscriptionId: string) => {
+    const user_id = useAuthStore.getState().user_id;
+    if (!user_id) throw new Error("User not authenticated");
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .delete()
+            .eq('subscription_id', subscriptionId)
+            .eq('user_id', user_id)
+            .select('subscription_id')
+            .single();
+        if (error) throw error;
+        return { data, errorC: null };
+    } catch (err: any) {
+        return { data: null, errorC: err.message || 'Deletion failed' };
     }
 }

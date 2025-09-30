@@ -14,7 +14,6 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);

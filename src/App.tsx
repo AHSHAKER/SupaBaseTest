@@ -12,6 +12,7 @@ import Transactions from './Pages/Transactions'
 import UserUsage from './Pages/UserUsage'
 import TicketsPage from './Pages/Tickets/TicketsPage'
 import CreateTicketForm from './Pages/Tickets/CreateTicketForm'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
 
@@ -26,7 +27,7 @@ function App() {
         <Route element={<ProtectedLayout />}>
           <Route path="/update-password" element={<UpdatePass />} />
           <Route element={<Layout />}>
-            <Route path="/" element={<Profile />} />
+            <Route path="/" element={<Profile />}/>
             <Route path="/edit-account" element={<EditAccount />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/transactions" element={<Transactions />} />
@@ -38,6 +39,10 @@ function App() {
           </Route>
         </Route>
       </Routes>
+      <ToastContainer
+        position="top-right"
+        progressClassName={"bg-blue-500"}
+      />
     </BrowserRouter>
   )
 }

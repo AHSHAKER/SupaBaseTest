@@ -90,7 +90,7 @@ const TicketDetail = ({ ticket, onClose }: Props) => {
             🚫 This ticket is closed. You can no longer send messages.
           </div>
         ) : (
-          <div className="p-6 border-t border-slate-100 flex space-x-2 bg-white">
+          <div className="p-6 border-t rounded-b-2xl border-slate-100 flex space-x-2 bg-white">
             <input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}

@@ -1,6 +1,8 @@
 import { signOut } from "../hooks/useAuth";
 import useAuthStore from "../Store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import CartModal from "../Pages/cart";
 
 const getInitials = (name?: string | null, email?: string | null) => {
   if (name) {
@@ -16,6 +18,7 @@ const getInitials = (name?: string | null, email?: string | null) => {
 };
 
 const Profile = () => {
+  const [cartOpen, setCartOpen] = useState(false);
   const profile = useAuthStore((state) => state);
   const Nav = useNavigate();
 
@@ -59,6 +62,12 @@ const Profile = () => {
             className="w-full px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
           >
             Sign Out
+          </button>
+          <button
+            onClick={() => setCartOpen(true)}
+            className="w-full px-4 py-2 rounded-md bg-green-600 text-white text-sm font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 transition"
+          >
+            View Cart
           </button>
         </div>
       </aside>
@@ -120,6 +129,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* Cart Modal */}
+      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 };

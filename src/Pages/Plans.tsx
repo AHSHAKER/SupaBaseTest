@@ -1,55 +1,97 @@
-import { useState } from "react";
-import { usePlans, subscribeToPlan, cancelSubscription } from "../hooks/usePlans";
+import { useState, useEffect } from "react";
+import { usePlans, createSubscription, cancelSubscription } from "../hooks/usePlans";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../Store/authStore";
-import { setProfile } from "../hooks/useProfile";
-
-interface PlanDetail {
-  planId: string;
-  plan_duration: string;
-  plan_price: number;
-  plan_name: string;
-  plan_code: string;
-}
+import { getPendingSubscriptions, setProfile } from "../hooks/useProfile";
+import { toast } from "react-toastify";
+import LoadingSpinner from "../Components/Randoms/LoadingSpinner";
 
 const Plans = () => {
-  const { plans, loading, error, refresh } = usePlans();
+  const [loading, setLoading] = useState<boolean>(true);
   const profile = useAuthStore((state) => state);
   const activePlanId = profile?.plan?.id;
-
+  const notify = (message: string) => toast(message);
   const [autoRenew, setAutoRenew] = useState(false);
   const navigate = useNavigate();
+  const [hasPending, setHasPending] = useState(false);
+
+  const { plans,  error, refresh } = usePlans();
+  useEffect(() => {
+    setLoading(true);
+    getPendingSubscriptions().then((res) => {
+      setHasPending(!!res.data);
+    }).finally(() => {
+      setLoading(false);
+  });
+}, []);
+  
+
+const ConfirmToast = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => (
+  <div>
+    <p>Are you sure you want to cancel your subscription?</p>
+    <div className="flex gap-2 mt-2">
+      <button
+        onClick={() => {
+          onConfirm();
+          toast.dismiss();
+        }}
+        className="px-3 py-1 bg-red-500 text-white rounded"
+      >
+        Yes, Cancel
+      </button>
+      <button
+        onClick={() => {
+          onCancel();
+          toast.dismiss();
+        }}
+        className="px-3 py-1 bg-gray-300 text-black rounded"
+      >
+        No
+      </button>
+    </div>
+  </div>
+);
+
 
   /** Subscribe to plan */
-  const handleSubscribe = async (planDetail: PlanDetail) => {
-    const { errorS } = await subscribeToPlan(planDetail, autoRenew);
+  const handleSubscribe = async (planID: string) => {
+    const { errorS } = await createSubscription(planID, autoRenew);
     if (errorS) {
-      alert("Error subscribing: " + errorS);
+      notify("Error subscribing to plan: " + errorS);
       return;
     }
-    alert("Subscribed successfully!");
+    notify("Subscribed successfully!");
     setProfile();
     navigate("/");
   };
 
   /** Cancel subscription */
-  const handleCancel = async (planName: string) => {
-    if (!window.confirm("Are you sure you want to cancel your subscription?")) return;
-
-    const { errorC } = await cancelSubscription(planName);
-    if (errorC) {
-      alert("Error canceling subscription: " + errorC);
-      return;
-    }
-    setProfile();
-    navigate("/");
-  };
-
+  const handleCancel = (planName: string) => {
+  toast(
+    <ConfirmToast
+      onConfirm={async () => {
+        const { errorC } = await cancelSubscription(planName);
+        if (errorC) {
+          notify("Error canceling subscription: " + errorC);
+          return;
+        }
+        setProfile();
+        navigate("/");
+      }}
+      onCancel={() => {}}
+    />,
+    { autoClose: false }
+  );
+};
+if (loading) {return (<LoadingSpinner />);}
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center p-8">
-      <h1 className="text-4xl font-bold text-slate-800 mb-8">Available Plans</h1>
-
-      {loading && <p className="text-slate-500">Loading plans...</p>}
+      <h1 className="text-4xl font-bold text-slate-800 mb-2">Available Plans</h1>
+      {hasPending && (
+        <div className="mb-6 text-orange-600 text-lg font-semibold text-center">
+          You have a pending subscription. Please activate or cancel it before subscribing to a new plan.
+        </div>
+      )}
       {error && (
         <div className="text-red-600 mb-4">
           Error loading plans: {error}
@@ -101,17 +143,9 @@ const Plans = () => {
                   </button>
                 </>
               ) : (
-                !activePlanId && (
+                !activePlanId && !hasPending && (
                   <button
-                    onClick={() =>
-                      handleSubscribe({
-                        planId: plan.plan_id,
-                        plan_duration: plan.billing_period,
-                        plan_price: plan.price_amount,
-                        plan_name: plan.name,
-                        plan_code: plan.code,
-                      })
-                    }
+                    onClick={() =>handleSubscribe(plan.plan_id)}
                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
                   >
                     Subscribe
@@ -123,8 +157,8 @@ const Plans = () => {
         })}
       </div>
 
-      {/* Only show auto-renew toggle when subscribing (not while already subscribed) */}
-      {!activePlanId && (
+      {/* Only show auto-renew toggle when subscribing (not while already subscribed or pending) */}
+      {!activePlanId && !hasPending && (
         <button
           className="mt-8 px-4 py-2 mx-auto bg-slate-100 text-slate-700 rounded-md border border-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 transition"
           onClick={() => setAutoRenew((prev) => !prev)}
